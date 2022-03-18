@@ -16,6 +16,7 @@ import { useAbstractMutation } from '@/hooks/use-abstract-mutation';
 import NetworkRequest from '@/components/NetworkRequest';
 import makeStyles from '@mui/styles/makeStyles';
 import { useQueueData } from '@/hooks/use-queue-data';
+import { useWebsocket } from '@/hooks/use-websocket';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -70,6 +71,7 @@ const JobLogs = () => {
       row: log,
     });
   };
+
   return (
     <>
       <DialogContent className={cls.root}>

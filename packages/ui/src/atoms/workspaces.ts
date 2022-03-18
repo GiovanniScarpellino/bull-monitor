@@ -1,5 +1,5 @@
 import { StorageConfig } from '@/config/storage';
-import { JobStatus, OrderEnum } from '@/typings/gql';
+import { Job, JobStatus, OrderEnum } from '@/typings/gql';
 import type { Maybe } from '@/typings/utils';
 import { atom } from 'jotai';
 import { v4 as uuidv4 } from 'uuid';

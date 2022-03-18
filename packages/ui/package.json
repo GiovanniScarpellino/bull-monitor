@@ -16,7 +16,9 @@
     "dev": "NODE_ENV=development vite --open --port=8080",
     "dev-with-mocks": "NODE_ENV=development VITE_ENABLE_MOCKS=true vite --open --port=8080",
     "build": "NODE_ENV=production vite build",
-    "build-demo": "VITE_ENABLE_MOCKS=true NODE_ENV=production vite build -c ./vite.config.demo.ts"
+    "watch": "NODE_ENV=development vite build --watch",
+    "build-demo": "VITE_ENABLE_MOCKS=true NODE_ENV=production vite build -c ./vite.config.demo.ts",
+    "serve": "npx serve -p 6702 -C"
   },
   "dependencies": {
     "@emotion/react": "^11.7.0",
@@ -48,6 +50,7 @@
     "react-query": "^3.13.3",
     "react-textarea-autosize": "^8.3.2",
     "recharts": "^2.0.9",
+    "socket.io-client": "^4.4.1",
     "uuid": "^8.3.2",
     "zustand": "^3.5.2"
   },

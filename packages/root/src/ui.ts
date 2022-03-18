@@ -3,8 +3,10 @@ const pkg = require('../package.json');
 export class UI {
   private uiVersion = pkg.version;
   private pkgName = '@bull-monitor/ui';
-  private cdnRoot = `https://cdn.jsdelivr.net/npm/${this.pkgName}@${this.uiVersion}`;
-  private resourcesRoot = this.cdnRoot + '/build';
+  // private cdnRoot = `https://cdn.jsdelivr.net/npm/${this.pkgName}@${this.uiVersion}`;
+  private cdnRoot = `http://192.168.129.87:6702`;
+  // private resourcesRoot = this.cdnRoot + '/build';
+  private resourcesRoot = this.cdnRoot;
   private buildCdnUrl(resource: string) {
     return this.resourcesRoot + resource;
   }

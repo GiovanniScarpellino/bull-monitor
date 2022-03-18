@@ -1,6 +1,6 @@
 import { useNetwork } from '@/hooks/use-network';
 import { QueryKeysConfig } from '@/config/query-keys';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import shallow from 'zustand/shallow';
 import { usePaginationStore } from '@/stores/pagination';
 import {
@@ -17,14 +17,17 @@ import {
   jobIdAtom,
   jobsOrderAtom,
 } from '@/atoms/workspaces';
+import { useWebsocket } from '@/hooks/use-websocket';
+import type { GetJobsQuery, JobStatus } from '@/typings/gql';
 
 export const useJobsQuery = () => {
   const {
     queries: { getJobs },
   } = useNetwork();
+
   const page = useAtomValue(activePageAtom);
   const perPage = usePaginationStore((state) => state.perPage);
-  const status = useAtomValue(activeStatusAtom);
+  const status = useAtomValue(activeStatusAtom) as JobStatus;
   const queue = useAtomValue(activeQueueAtom) as string;
   const order = useAtomValue(jobsOrderAtom);
   const jobId = useAtomValue(jobIdAtom);
@@ -35,31 +38,64 @@ export const useJobsQuery = () => {
     shallow
   );
   const refetchInterval = getPollingInterval();
+
+  const queryKey = [
+    QueryKeysConfig.jobsList,
+    {
+      queue,
+      perPage,
+      page,
+      status,
+      order,
+      id: jobId,
+      dataSearch,
+      shouldFetchData,
+    }
+  ];
+
+  const queryClient = useQueryClient();
+
+  const { listen, format } = useWebsocket();
+
+  const mutation = useMutation<void, unknown, { job: any, action: 'delete' | 'update' | 'create' }, unknown>(async (params) => {
+    queryClient.setQueryData<GetJobsQuery>(queryKey, (old) => {
+      let jobs = old!.jobs.map(job => format.job(job, status));
+
+      if(params.action === 'create'){
+        jobs.unshift(format.job(params.job, status));
+      }
+      else if(params.action === 'delete'){
+        const jobIndex = jobs.findIndex(job => job.id === params.job.id);
+        if(jobIndex !== -1){
+          jobs.splice(jobIndex, 1);
+        }
+      }
+      else if(params.action === 'update'){
+        const jobIndex = jobs.findIndex(job => job.id === params.job.id);
+        if(jobIndex !== -1){
+          jobs[jobIndex] = format.job(params.job, status);
+        }
+      }
+
+      return { jobs: jobs };
+    });
+  });
+
   return useQuery(
-    [
-      QueryKeysConfig.jobsList,
-      {
-        queue,
-        perPage,
-        page,
-        status,
-        order,
-        id: jobId,
-        dataSearch,
-        shouldFetchData,
-      },
-    ],
-    () =>
-      getJobs({
-        queue,
-        limit: perPage,
-        offset: page * perPage,
-        status,
-        order,
-        id: jobId,
-        fetchData: shouldFetchData,
-        dataSearch: dataSearch,
-      }),
+    queryKey,
+    () => getJobs({
+      queue,
+      limit: perPage,
+      offset: page * perPage,
+      status,
+      order,
+      id: jobId,
+      fetchData: shouldFetchData,
+      dataSearch: dataSearch,
+    }).then(query => {
+      listen.jobStatus(mutation, queue, status);
+      return query;
+    }),
     {
       keepPreviousData: true,
       enabled: Boolean(queue),

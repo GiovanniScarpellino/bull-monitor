@@ -24,12 +24,26 @@ export default function NetworkSettings() {
     pollingInterval,
     changePollingInterval,
     shouldFetchData,
+    shouldUseWebsocket,
     toggleShouldFetchData,
+    toggleShouldUseWebsocket,
     textSearchPollingDisabled,
     toggleTextSearchPollingDisabled,
   } = useNetworkSettingsStore();
   return (
     <div>
+      <FormControl margin="dense">
+        <FormControlLabel
+          control={
+            <Switch
+              checked={shouldUseWebsocket}
+              onChange={toggleShouldUseWebsocket}
+            />
+          }
+          label="Use websockets"
+        />
+      </FormControl>
+
       <TextField
         variant="outlined"
         margin="normal"
@@ -57,6 +71,7 @@ export default function NetworkSettings() {
           label="Fetch and render data"
         />
       </FormControl>
+
       <FormControl margin="dense">
         <FormControlLabel
           control={
