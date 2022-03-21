@@ -8,6 +8,7 @@ type TState = {
   shouldFetchData: boolean;
   shouldUseWebsocket: boolean;
   textSearchPollingDisabled: boolean;
+  disablePolling: boolean;
 
   toggleShouldFetchData: () => void;
   toggleShouldUseWebsocket: () => void;
@@ -20,6 +21,8 @@ export const useNetworkSettingsStore = createStore<TState>(
       shouldFetchData: true,
       shouldUseWebsocket: false,
       pollingInterval: 5000,
+      disablePolling: false,
+      
       textSearchPollingDisabled: true,
 
       changePollingInterval: (pollingInterval) => set({ pollingInterval }),
@@ -30,7 +33,13 @@ export const useNetworkSettingsStore = createStore<TState>(
       toggleShouldFetchData: () =>
         set(({ shouldFetchData }) => ({ shouldFetchData: !shouldFetchData })),
       toggleShouldUseWebsocket: () =>
-        set(({ shouldUseWebsocket }) => ({ shouldUseWebsocket: !shouldUseWebsocket })),
+        set(({ shouldUseWebsocket }) => {
+          return {
+            disablePolling: !shouldUseWebsocket,
+            shouldUseWebsocket: !shouldUseWebsocket,
+            pollingInterval: 5000,
+          };
+        }),
     }),
     {
       name: `${StorageConfig.persistNs}network`,

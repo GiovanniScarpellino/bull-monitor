@@ -23,6 +23,7 @@ export default function NetworkSettings() {
   const {
     pollingInterval,
     changePollingInterval,
+    disablePolling,
     shouldFetchData,
     shouldUseWebsocket,
     toggleShouldFetchData,
@@ -50,6 +51,7 @@ export default function NetworkSettings() {
         value={pollingInterval}
         onChange={(e) => changePollingInterval(Number(e.target.value))}
         fullWidth
+        disabled={disablePolling}
         select
         id="network__polling-interval"
         label="Polling Interval"
