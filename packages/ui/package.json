@@ -18,7 +18,7 @@
     "build": "NODE_ENV=production vite build",
     "watch": "NODE_ENV=development vite build --watch",
     "build-demo": "VITE_ENABLE_MOCKS=true NODE_ENV=production vite build -c ./vite.config.demo.ts",
-    "serve": "npx serve -p 6702 -C"
+    "serve": "npx serve build -p 6702 -C"
   },
   "dependencies": {
     "@emotion/react": "^11.7.0",
