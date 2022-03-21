@@ -93,7 +93,7 @@ export const useJobsQuery = () => {
       fetchData: shouldFetchData,
       dataSearch: dataSearch,
     }).then(query => {
-      listen.jobStatus(mutation, queue, status);
+      listen.jobs(queue, status, (param) => mutation.mutate(param));
       return query;
     }),
     {

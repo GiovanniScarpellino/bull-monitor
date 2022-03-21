@@ -4,7 +4,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import Button from '@mui/material/Button';
 import shallow from 'zustand/shallow';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { QueryKeysConfig } from '@/config/query-keys';
 import { useJobLogsStore } from '@/stores/job-logs';
 import TextField from '@mui/material/TextField';
@@ -17,6 +17,7 @@ import NetworkRequest from '@/components/NetworkRequest';
 import makeStyles from '@mui/styles/makeStyles';
 import { useQueueData } from '@/hooks/use-queue-data';
 import { useWebsocket } from '@/hooks/use-websocket';
+import type { JobLogs } from '@/typings/gql';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -56,6 +57,20 @@ const JobLogs = () => {
       enabled: Boolean(jobIdentity),
     }
   );
+
+  const queryClient = useQueryClient();
+  const { listen } = useWebsocket();
+
+  const queryMutation = useMutation<void, unknown, { job: { logs: { logs: any } } }, unknown>(async (params) => {
+    queryClient.setQueryData<{ job: { logs: { logs: any } } }>([QueryKeysConfig.jobLogs, jobIdentity], (old) => {
+      const logs = old?.job.logs.logs;
+      logs.push(params.job!.logs!.logs);
+      return { job: { logs: { logs: logs } } };
+    });
+  });
+
+  listen.logs(jobIdentity, (log) => queryMutation.mutate({ job: { logs: { logs: log } } }));
+  
   const mutation = useAbstractMutation({
     mutation: createJobLog,
     toast: 'Created',
